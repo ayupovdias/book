@@ -21,5 +21,5 @@ func main() {
 	r.GET("/categories", handlers.GetCategories)
 	r.POST("/categories", handlers.CreateCategory)
 
-	r.Run(":8080")
+	r.Run(":8181")
 }
