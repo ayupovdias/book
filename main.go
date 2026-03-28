@@ -2,27 +2,24 @@ package main
 
 import (
 	"book/handlers"
-	"log"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := mux.NewRouter()
+	r := gin.Default()
 
-	r.HandleFunc("/books", handlers.GetBooks).Methods("GET")
-	r.HandleFunc("/books", handlers.CreateBook).Methods("POST")
-	r.HandleFunc("/books/{id}", handlers.GetBook).Methods("GET")
-	r.HandleFunc("/books/{id}", handlers.UpdateBook).Methods("PUT")
-	r.HandleFunc("/books/{id}", handlers.DeleteBook).Methods("DELETE")
+	r.GET("/books", handlers.GetBooks)
+	r.POST("/books", handlers.CreateBook)
+	r.GET("/books/:id", handlers.GetBook)
+	r.PUT("/books/:id", handlers.UpdateBook)
+	r.DELETE("/books/:id", handlers.DeleteBook)
 
-	r.HandleFunc("/authors", handlers.GetAuthors).Methods("GET")
-	r.HandleFunc("/authors", handlers.CreateAuthor).Methods("POST")
+	r.GET("/authors", handlers.GetAuthors)
+	r.POST("/authors", handlers.CreateAuthor)
 
-	r.HandleFunc("/categories", handlers.GetCategories).Methods("GET")
-	r.HandleFunc("/categories", handlers.CreateCategory).Methods("POST")
+	r.GET("/categories", handlers.GetCategories)
+	r.POST("/categories", handlers.CreateCategory)
 
-	log.Println("Server running on :8080")
-	http.ListenAndServe(":8080", r)
+	r.Run(":8080")
 }
