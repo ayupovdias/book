@@ -1,25 +1,40 @@
 package main
 
 import (
+	"book/config"
 	"book/handlers"
+	"book/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	db.InitDB()
 	r := gin.Default()
 
-	r.GET("/books", handlers.GetBooks)
-	r.POST("/books", handlers.CreateBook)
-	r.GET("/books/:id", handlers.GetBook)
-	r.PUT("/books/:id", handlers.UpdateBook)
-	r.DELETE("/books/:id", handlers.DeleteBook)
+	r.POST("/register", handlers.Register)
+	r.POST("/login", handlers.Login)
 
-	r.GET("/authors", handlers.GetAuthors)
-	r.POST("/authors", handlers.CreateAuthor)
+	protected := r.Group("/")
+	protected.Use(middlewares.AuthMiddleware())
+	{
+		protected.GET("/books", handlers.GetBooks)
+		protected.POST("/books", handlers.AddBook)
 
-	r.GET("/categories", handlers.GetCategories)
-	r.POST("/categories", handlers.CreateCategory)
+		protected.GET("/books/favorites", handlers.GetFavoriteBooks)
 
-	r.Run(":8181")
+		protected.GET("/books/:id", handlers.GetBook)
+		protected.PUT("/books/:id", handlers.UpdateBook)
+		protected.DELETE("/books/:id", handlers.DeleteBook)
+
+		protected.PUT("/books/:id/favorites", handlers.AddToFavorites)
+		protected.DELETE("/books/:id/favorites", handlers.RemoveFromFavorites)
+
+		protected.GET("/authors", handlers.GetAuthors)
+		protected.POST("/authors", handlers.AddAuthor)
+		protected.GET("/categories", handlers.GetCategories)
+		protected.POST("/categories", handlers.AddCategory)
+	}
+
+	r.Run(":8081")
 }

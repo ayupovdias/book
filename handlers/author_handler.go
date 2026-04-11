@@ -1,38 +1,28 @@
 package handlers
 
 import (
+	"book/config"
 	"book/models"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-var authors = make(map[int]models.Author)
-var authorID = 1
-
 func GetAuthors(c *gin.Context) {
-	var result []models.Author
-	for _, a := range authors {
-		result = append(result, a)
-	}
-	c.JSON(http.StatusOK, result)
+	var authorList []models.Author
+	db.DB.Find(&authorList)
+	c.JSON(http.StatusOK, authorList)
 }
 
-func CreateAuthor(c *gin.Context) {
+func AddAuthor(c *gin.Context) {
 	var author models.Author
-
 	if err := c.ShouldBindJSON(&author); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if author.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name required"})
+	if err := db.DB.Create(&author).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not save author"})
 		return
 	}
-
-	author.ID = authorID
-	authorID++
-	authors[author.ID] = author
-
 	c.JSON(http.StatusCreated, author)
 }
